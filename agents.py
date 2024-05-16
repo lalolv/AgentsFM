@@ -3,6 +3,7 @@ from crewai_tools import ScrapeWebsiteTool
 from textwrap import dedent
 from langchain_community.llms import Ollama
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
+from langchain_google_genai import GoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_community.tools import DuckDuckGoSearchRun
@@ -10,6 +11,7 @@ from langchain_community.tools.bing_search import BingSearchRun
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from dotenv import load_dotenv
+import os
 
 
 load_dotenv()
@@ -31,6 +33,8 @@ class FMAgents:
         #     model_name="gpt-3.5-turbo", temperature=0.7)
         # self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
         # self.AzureOpenAI = AzureChatOpenAI()
+        self.Gemini = GoogleGenerativeAI(
+            model="gemini-1.5-flash", google_api_key=os.getenv('GEMINI_KEY'))
         self.Ollama = Ollama(model="llama3:instruct")
         self.Qwen = Ollama(model="qwen:14b-chat")
         self.Yi = Ollama(model="yi:9b-v1.5")

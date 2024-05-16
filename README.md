@@ -4,5 +4,5 @@
 
 ## 新闻源
 
+- https://aibusiness.com/
 - https://www.datacenterdynamics.com/en/rss/
-- https://36kr.com/feed

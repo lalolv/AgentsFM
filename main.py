@@ -22,6 +22,7 @@ if __name__ == "__main__":
 
     aidj = input("AI DJ [nancy ting xiao tong bai qiang john]: ")
     feed_lang = input("Feed language [zh en]: ")
+    feed_skip = int(input("Feed Skip: "))
     urls = []
     # 读取资源列表
     with open('/Volumes/AgentsFM/ai-dj.json', 'r', encoding='utf8') as items:
@@ -48,7 +49,7 @@ if __name__ == "__main__":
         news_list = loader.load()
         # 遍历新闻数据
         fm_crew = FMCrew()
-        for news_item in news_list:
+        for news_item in news_list[feed_skip:]:
             # 音乐信息
             track = tracks[track_idx]
             # 新闻标题和内容
