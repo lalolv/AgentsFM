@@ -21,12 +21,13 @@ if __name__ == "__main__":
     print("-------------------------------")
 
     aidj = input("AI DJ [nancy ting xiao tong bai qiang john]: ")
+    feed_lang = input("Feed language [zh en]: ")
     urls = []
     # 读取资源列表
     with open('/Volumes/AgentsFM/ai-dj.json', 'r', encoding='utf8') as items:
         aidjs = json.load(items)
         aidj_info = aidjs[aidj]
-        urls.extend(aidj_info["feed"])
+        urls.extend(aidj_info["feed_{}".format(feed_lang)])
         
     # 读取 tracks 文件
     with open('./data/tracks.json', 'r', encoding='utf8') as fp:
@@ -43,7 +44,7 @@ if __name__ == "__main__":
         track_idx:int = 0
         # 读取新闻 zh en
         read_idx:int = 0
-        loader = RSSFeedLoader(urls=urls, nlp=False, language='en')
+        loader = RSSFeedLoader(urls=urls, nlp=False, language=feed_lang)
         news_list = loader.load()
         # 遍历新闻数据
         fm_crew = FMCrew()
@@ -52,16 +53,17 @@ if __name__ == "__main__":
             track = tracks[track_idx]
             # 新闻标题和内容
             title = news_item.metadata['title']
+            link = news_item.metadata['link']
             content = news_item.page_content
-            result = fm_crew.broadcasting_news(title, content)
+            result = fm_crew.broadcasting_news(title, content, link)
             # 写入文件
             resfile = open("./data/human_eval.txt", "w", encoding="utf-8")
             resfile.write(result)
             resfile.close()
             # 人类评估
             eval_continue = input(
-                "需要评估[{0}]，是否继续？Y / n / s(Stop) -> ".format({read_idx+1}))
-            if eval_continue.lower() == 'y' or eval_continue == '':
+                "需要评估[{0}]，是否继续？Y / ys / n / s(Stop) -> ".format(read_idx+1))
+            if eval_continue == '' or "y" in eval_continue.lower():
                 # 从文件中读取新的文案
                 with open('./data/human_eval.txt', 'r', encoding='utf8') as human_eval:
                     new_result = human_eval.read()
@@ -81,6 +83,9 @@ if __name__ == "__main__":
                     track_idx = 0
                 else:
                     track_idx += 1
+                # yes and stop
+                if eval_continue.lower() == "ys":
+                    break
             elif eval_continue.lower() == 'n':
                 # 重新生成
                 print('跳过：{0}'.format(track["title"]))

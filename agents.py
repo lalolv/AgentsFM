@@ -18,7 +18,7 @@ tavily_search_tool = TavilySearchResults()
 # bing_search_tool = BingSearchRun()
 ddg_search_tool = DuckDuckGoSearchRun()
 scrape_search_tool = ScrapeWebsiteTool()
-wikipedia_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper())
+wikipedia_tool = WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang='zh'))
 
 # This is an example of how to define custom agents.
 # You can define as many agents as you want.
@@ -32,7 +32,8 @@ class FMAgents:
         # self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
         # self.AzureOpenAI = AzureChatOpenAI()
         self.Ollama = Ollama(model="llama3:instruct")
-        self.Qwen = Ollama(model="qwen:14b")
+        self.Qwen = Ollama(model="qwen:14b-chat")
+        self.Yi = Ollama(model="yi:9b-v1.5")
         # GROP, 30 RPM; 14,400 RPD; 
         # mixtral-8x7b-32768 5,000 TPM
         # llama3-70b-8192 6,000 TPM
@@ -42,13 +43,13 @@ class FMAgents:
         return Agent(
             role="Information Investigator",
             backstory=dedent(f"""你在一家领先的广播电台工作。您的专长是识别新兴趋势。
-                您善于收集、解读和总结概括前沿信息。"""),
+                您善于收集、解读、总结并概括这些前沿信息。"""),
             goal=dedent(f"""提供参考信息"""),
             tools=[scrape_search_tool, ddg_search_tool, wikipedia_tool, tavily_search_tool],
             allow_delegation=True,
             verbose=False,
-            llm=self.Ollama,
-            max_iter=6
+            llm=self.Yi,
+            max_iter=10
         )
 
     def music_analyst(self):

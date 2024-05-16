@@ -42,20 +42,20 @@ class FMCrew:
         return result
 
     # 抓取新闻，并保存到文件中
-    def broadcasting_news(self, title:str, content:str):
+    def broadcasting_news(self, title: str, content: str, link:str):
         # Define your custom agents and tasks here
         researcher = self.agents.research_agent()
         editor = self.agents.scripts_content_editor()
 
         # 总结新闻
-        summarize_news = self.tasks.summarize_news(researcher, content)
+        summarize_feed = self.tasks.summarize_feed(researcher, link, content)
         # 撰写脚本
-        draft_scripts = self.tasks.draft_news_scripts(editor, title)
+        draft_scripts = self.tasks.draft_news_scripts(editor, title, link)
 
         # Define your custom crew here
         crew = Crew(
             agents=[researcher, editor],
-            tasks=[summarize_news, draft_scripts],
+            tasks=[summarize_feed, draft_scripts],
             verbose=True,
             process=Process.sequential
         )

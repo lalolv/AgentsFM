@@ -13,7 +13,7 @@ class FMTasks:
         return Task(
             description=dedent(
                 f"""
-                    请使用简短的文案，总结和概括下面资讯页面的核心内容。
+                    请使用简短的文案，总结、概括和解读下面的关键内容内容。
                     {web}
 
                     确保尽可能为 Scripts Content Editor 提供最新的、最有价值的参考信息。
@@ -32,6 +32,20 @@ class FMTasks:
                 """
             ),
             expected_output="Summarize a paragraph that tells the audience something new and valuable.",
+            agent=agent,
+        )
+    
+    def summarize_feed(self, agent, link:str, content:str):
+        return Task(
+            description=dedent(
+                f"""
+                    请使用简体中文，总结和分析以下文章或网页链接的主要观点：
+                    > {content}
+                    >
+                    > **网页链接** {link}
+                """
+            ),
+            expected_output="编写一篇总结性的文案",
             agent=agent,
         )
 
@@ -111,16 +125,22 @@ class FMTasks:
         )
     
     # 脚本内容参考 "Information Investigator" 或 "Music Specialist" 提供的信息。
-    def draft_news_scripts(self, agent, title:str):
+    def draft_news_scripts(self, agent, title:str, link:str):
         return Task(
             description=dedent(
                 f"""
-                获取 [Information Investigator] 提供的上下文参考信息，
-                在尽量保持原文内容不变的基础上，翻译成中文后讲述新闻、资讯、观点或解读。
+                ## 任务描述
+                获取 **Information Investigator** 提供的上下文参考信息，
+                在尽量保持原文内容不变的基础上，
+                使用**简体中文**，通过轻松、愉悦和闲聊的语气风格，来讲述资讯、知识和一些观点。
+                ---
 
-                标题: {title} 
+                > 标题: {title} 
+                >
+                > 链接: {link}
 
-                可以使用简单的一句话作为结尾，例如：
+                ## 文案结尾
+                接下来会播放一段音乐，所以需要使用简短的一句话作为结尾，如：
                 - 一段美妙的音乐后，我们继续聊聊有趣的话题。
                 - 继续进入音乐的世界，之后带来更加有意思的话题。
                 - 放松一下，先听一段动感的音乐。
@@ -128,17 +148,33 @@ class FMTasks:
                 - 动感的音乐之后再继续。您有什么想聊的吗？
                 - 音乐不停，话题不断。您还有什么想说的吗？
                 - 好了！再次回到音乐的世界，不要走开。
+                - 马上进一段音乐
+                - etc.
 
-                翻译的时候，需要注意以下几点：
-                - AI 翻译为：人工智能
-                - Netflix 翻译为：网飞
+                ## 语气助词
+                在文案中，可以适当增加一些**语气助词**，使语言更具表现力和生动性，如：
+                - 吧：用于建议、请求或推测语气。
+                - 呢：用于表示疑问、反问或强调当前状态。
+                - 啊：用于表示感叹、确认或疑问。
+                - 嘛：用于表示理所当然或解释说明。
+                - 啦：用于表示命令、催促或结束。
+                - 哇：用于表示惊讶或感叹。
+                - 嘛：用于强调某种理由或事实。
 
-                不要包含多余的提示信息，如：Notice、Note 等。
-                最终的文案内容，必须是纯中文文本格式，不要包含其他格式的字符，比如 Markdown。
+                ## 注意事项
+                1. 尽量把专有名词也翻译成简体中文，如：
+                - “AI” 翻译为：人工智能
+                - “Netflix” 翻译为：网飞
+                - etc.
+                2. 不要包含多余的提示信息，如：
+                - Notice ...
+                - Note ...
+                - etc.
+                3. 最终的文案内容，必须是**纯文本格式**，不要包含其他格式的字符或标记，比如 Markdown。
 
                 {self.__tip_section()}
                 """
             ),
-            expected_output="编写一段连续性中文脚本",
+            expected_output="使用简体中文，编写一篇1200字以内的、连贯性的精彩文案",
             agent=agent
         )
