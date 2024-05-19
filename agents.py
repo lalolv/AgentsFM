@@ -52,7 +52,7 @@ class FMAgents:
             tools=[scrape_search_tool, ddg_search_tool, wikipedia_tool, tavily_search_tool],
             allow_delegation=True,
             verbose=False,
-            llm=self.Yi,
+            llm=self.Qwen,
             max_iter=10
         )
 
