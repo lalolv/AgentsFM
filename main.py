@@ -71,6 +71,11 @@ if __name__ == "__main__":
                 "w", encoding="utf-8")
             resfile.write(json.dumps(msg))
             resfile.close()
+            # 如果超出播放列表，则重置 0
+            if track_idx == len(tracks)-1:
+                track_idx = 0
+            else:
+                track_idx += 1
             # 计数器
             feed_idx += 1
             if feed_limit < feed_idx:
