@@ -19,6 +19,8 @@ else:
     with open(os.path.join(path, files[0]), 'r', encoding='utf8') as fp:
         message = json.load(fp)
         # print(message)
+        # 统计
+        st.subheader("_待处理数量_ :blue[{}]".format(len(files)))
         # text
         txt = st.text_area(
             label="评审内容",
@@ -26,6 +28,7 @@ else:
             placeholder="加载内容...",
             height=600
         )
+        
 
     # push button
     if st.button(label="推送", type="primary"):
