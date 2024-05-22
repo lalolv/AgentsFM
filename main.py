@@ -36,10 +36,6 @@ if __name__ == "__main__":
     with open('./data/tracks.json', 'r', encoding='utf8') as fp:
         # mq
         mq_host = os.getenv('mq_addr')
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=mq_host, heartbeat=0))
-        channel = connection.channel()
-        channel.queue_declare(queue='agents-fm-ai-human')
         # 解析json格式
         tracks = json.load(fp)
         # 随机排序
@@ -82,5 +78,3 @@ if __name__ == "__main__":
                 break
             # Sleep
             time.sleep(6)
-        # close
-        connection.close()
