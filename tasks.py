@@ -23,15 +23,17 @@ class FMTasks:
             agent=agent,
         )
     
-    def summarize_news(self, agent, content):
+    def summarize_news(self, agent, link: str, content: str):
         return Task(
             description=dedent(
                 f"""
-                    Summarize and analyze the key points of the content：
-                    {content}
+                    Interpret, analyze and summarise the key points of the following article content (or URL):
+                    > {content}
+                    >
+                    > **URL** {link}
                 """
             ),
-            expected_output="Summarize a paragraph that tells the audience something new and valuable.",
+            expected_output="A summary paragraph",
             agent=agent,
         )
     
@@ -126,34 +128,51 @@ class FMTasks:
     
     # 脚本内容参考 "Information Investigator" 或 "Music Specialist" 提供的信息。
     # tick-tock
-    def draft_news_scripts(self, agent, title:str, link:str):
+    # 2. The final content of the copy must be in **plain text format ** 
+    # and not contain characters or markup in other formats, such as Markdown。
+    def draft_news_scripts(self, agent, title:str, link:str, content:str):
         return Task(
             description=dedent(
                 f"""
-                ## 任务描述
-                获取 **Information Investigator** 提供的上下文参考信息，
-                在尽量保持原文内容不变的基础上，
-                使用**简体中文**，通过轻松、愉悦、幽默和闲聊的语气风格，来讲述资讯、知识和一些观点。
-                ---
+                ## Task Description
+                - Interpret, analyze and summarise the key points of the following content (or URL).
+                - Knowledge and some ideas are presented in a light, pleasant, humorous and chatty tone.
+                - Try to keep the original point of view and content.
+                - Written in semantically coherent, fluent, elegant, and advanced **Simplified Chinese**.
+                - Keep the meaning the same, but make it more literary.
 
-                > 标题: {title} 
-                >
-                > 链接: {link}
+                ----
 
-                ## 注意事项
-                1. 尽量把专有名词也翻译成简体中文，如：
-                - “AI” 翻译为：人工智能
-                - “Netflix” 翻译为：网飞
-                - etc.
-                2. 不要包含多余的提示信息，如：
+                > Title: {title}
+                > Content: {content}
+                > URL: {link}
+
+                ----
+
+                ## Notes
+                1. Don't include redundant prompts，如：
                 - Notice ...
                 - Note ...
                 - etc.
-                3. 最终的文案内容，必须是**纯文本格式**，不要包含其他格式的字符或标记，比如 Markdown。
+                2. The final copy content, which must be in plain text format, 
+                should not contain characters from other formats, such as Markdown.
 
                 {self.__tip_section()}
                 """
             ),
-            expected_output="使用简体中文，编写一篇2000字以内的、连贯性的精彩文案",
+            expected_output="A coherent and amazing plain Chinese text, up to 3000 words",
+            agent=agent
+        )
+
+    def translate_scripts(self, agent):
+        return Task(
+            description=dedent(
+            f"""
+                把最终答案，翻译为简体中文。
+
+                {self.__tip_section()}
+                """
+            ),
+            expected_output="一段以中文为主要语言的文本",
             agent=agent
         )

@@ -7,6 +7,9 @@ import random
 from utils.strings import remove_newlines
 from crews import FMCrew
 from langchain_community.document_loaders import RSSFeedLoader
+from agents import FMAgents
+from tasks import FMTasks
+from crewai import Crew, Process
 
 
 # This is the main class that you will use to define your custom crew.
@@ -45,8 +48,10 @@ if __name__ == "__main__":
         read_idx:int = 0
         loader = RSSFeedLoader(urls=urls, nlp=False, language=feed_tag)
         news_list = loader.load()
+        # agent
+        agents = FMAgents()
+        tasks = FMTasks()
         # 遍历新闻数据
-        fm_crew = FMCrew()
         for news_item in news_list[feed_skip:]:
             # 音乐信息
             track = tracks[track_idx]
@@ -54,16 +59,29 @@ if __name__ == "__main__":
             title = news_item.metadata['title']
             link = news_item.metadata['link']
             content = news_item.page_content
-            result = fm_crew.broadcasting_news(title, content, link)
+            id = uuid.uuid4()
+            # Agent：writer
+            writer = agents.scripts_content_writer()
+            # 任务：撰写脚本
+            draft_scripts = tasks.draft_news_scripts(
+                writer, title, link, content)
+            # Define crew
+            crew = Crew(
+                id=id,
+                agents=[writer],
+                tasks=[draft_scripts],
+                verbose=True,
+                process=Process.sequential
+            )
+            result = crew.kickoff()
             # 写入文件
             msg = {
                 "script": result,
                 "role": aidj,
                 "track": track
             }
-            file_name = uuid.uuid4()
             resfile = open(
-                "./human/{0}_{1}.json".format(aidj, file_name.hex), 
+                "./human/{0}_{1}.json".format(aidj, id.hex), 
                 "w", encoding="utf-8")
             resfile.write(json.dumps(msg))
             resfile.close()
