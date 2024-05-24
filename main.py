@@ -59,7 +59,6 @@ if __name__ == "__main__":
             title = news_item.metadata['title']
             link = news_item.metadata['link']
             content = news_item.page_content
-            id = uuid.uuid4()
             # Agent：writer
             writer = agents.scripts_content_writer()
             # 任务：撰写脚本
@@ -67,7 +66,6 @@ if __name__ == "__main__":
                 writer, title, link, content)
             # Define crew
             crew = Crew(
-                id=id,
                 agents=[writer],
                 tasks=[draft_scripts],
                 verbose=True,
@@ -81,7 +79,7 @@ if __name__ == "__main__":
                 "track": track
             }
             resfile = open(
-                "./human/{0}_{1}.json".format(aidj, id.hex), 
+                "./human/{0}_{1}.json".format(aidj, crew.id.hex),
                 "w", encoding="utf-8")
             resfile.write(json.dumps(msg))
             resfile.close()

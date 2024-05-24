@@ -150,7 +150,7 @@ class FMTasks:
                 ----
 
                 ## Notes
-                1. Don't include redundant prompts，如：
+                1. Don't include redundant prompts，example:
                 - Notice ...
                 - Note ...
                 - etc.
