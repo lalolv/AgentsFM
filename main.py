@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import os, uuid
 import json
-import time
+import time, datetime
 import pika
 import random
 from utils.strings import remove_newlines
@@ -10,6 +10,7 @@ from langchain_community.document_loaders import RSSFeedLoader
 from agents import FMAgents
 from tasks import FMTasks
 from crewai import Crew, Process
+from pymongo import MongoClient
 
 
 # This is the main class that you will use to define your custom crew.
@@ -51,6 +52,10 @@ if __name__ == "__main__":
         # agent
         agents = FMAgents()
         tasks = FMTasks()
+        # mongo
+        client = MongoClient("mongodb://root:1128@192.168.50.177:27017")
+        db = client["agents_fm"]
+        col_aidj = db["ai_dj"]
         # 遍历新闻数据
         for news_item in news_list[feed_skip:]:
             # 音乐信息
@@ -72,17 +77,23 @@ if __name__ == "__main__":
                 process=Process.sequential
             )
             result = crew.kickoff()
-            # 写入文件
+            # 保存的数据
             msg = {
+                "title": "xxx",
                 "script": result,
                 "role": aidj,
-                "track": track
+                "track": track,
+                "date": datetime.datetime.now(),
+                "status": 0
             }
-            resfile = open(
-                "./human/{0}_{1}.json".format(aidj, crew.id.hex),
-                "w", encoding="utf-8")
-            resfile.write(json.dumps(msg))
-            resfile.close()
+            # resfile = open(
+            #     "./human/{0}_{1}.json".format(aidj, crew.id.hex),
+            #     "w", encoding="utf-8")
+            # resfile.write(json.dumps(msg))
+            # resfile.close()
+            # 保存到 MongoDB
+            script_id = col_aidj.insert_one(msg).inserted_id
+            print("Script ID: {}".format(script_id))
             # 如果超出播放列表，则重置 0
             if track_idx == len(tracks)-1:
                 track_idx = 0
@@ -94,3 +105,5 @@ if __name__ == "__main__":
                 break
             # Sleep
             time.sleep(6)
+        # close
+        client.close()

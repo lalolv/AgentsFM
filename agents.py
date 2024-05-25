@@ -33,7 +33,7 @@ class FMAgents:
         # self.Gemini = GoogleGenerativeAI(
         #     model="gemini-1.5-flash", google_api_key=os.getenv('GEMINI_KEY'))
         # self.Ollama = Ollama(model="llama3:instruct")
-        self.Qwen = Ollama(model="qwen:14b-chat")
+        self.Qwen = Ollama(model="qwen:14b-chat-v1.5")
         # self.Yi = Ollama(model="yi:9b-v1.5")
         # GROP, 30 RPM; 14,400 RPD; 
         # mixtral-8x7b-32768 5,000 TPM
