@@ -11,8 +11,6 @@ from langchain_community.tools.bing_search import BingSearchRun
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from dotenv import load_dotenv
-import os
-from tools.translate_tool import TranslateTools
 
 
 load_dotenv()
@@ -85,14 +83,13 @@ class FMAgents:
                 Turn bland words into compelling stories.
             """),
             goal=dedent(f"""Write a summary paragraph in Chinese"""),
-            tools=[wikipedia_tool],
+            tools=[wikipedia_tool, tavily_search_tool],
             allow_delegation=False,
             verbose=True,
             llm=self.Qwen,
-            max_iter=6,
+            max_iter=15,
             max_rpm=30,
-            memory=False,
-            max_execution_time=None
+            memory=False
         )
     
     # WikipediaQueryRun(api_wrapper=WikipediaAPIWrapper(lang='en'))

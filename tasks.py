@@ -1,5 +1,6 @@
 from crewai import Task
 from textwrap import dedent
+from model.output import OutScript
 
 
 # This is an example of how to define custom tasks.

@@ -1,16 +1,19 @@
 import streamlit as st
-import os
+from langchain_core.utils import get_from_env
 import json
 import pika
 from pymongo import MongoClient
 import datetime
+from dotenv import load_dotenv
 
 
-queue_host = '192.168.50.177'
+
+load_dotenv()
+
 push_topic = 'agents-fm-ai-dj'
 
 # mongo
-client = MongoClient("mongodb://root:1128@192.168.50.177:27017")
+client = MongoClient(get_from_env("MongoDB URL", "MONGODB_URL"))
 db = client["agents_fm"]
 col_aidj = db["ai_dj"]
 # col_aidj.create_index([("timer", 1)], expireAfterSeconds=360)
@@ -65,7 +68,7 @@ else:
             "track": item['track']
         }
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=queue_host))
+            pika.ConnectionParameters(host=get_from_env("MQ Host", "MQ_HOST")))
         channel = connection.channel()
         channel.queue_declare(queue=push_topic)
         channel.basic_publish(exchange='',
