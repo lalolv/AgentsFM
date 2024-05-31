@@ -38,92 +38,95 @@ if __name__ == "__main__":
         aidj_info = aidjs[aidj]
         urls.extend(aidj_info["feed_{}".format(feed_lang)])
         
-    # 读取 tracks 文件
-    with open('./data/tracks.json', 'r', encoding='utf8') as fp:
-        # mq
-        mq_host = get_from_env("MQ_HOST", "MQ_HOST")
-        # 解析json格式
-        tracks = json.load(fp)
-        # 随机排序
-        random.shuffle(tracks)
-        track_idx:int = 0
-        # 读取新闻 zh en
-        read_idx:int = 0
-        loader = RSSFeedLoader(
-            urls=urls[feed_url_idx-1:feed_url_idx], nlp=False, language=feed_lang)
-        news_list = loader.load()
-        # agent
-        agents = FMAgents()
-        tasks = FMTasks()
-        # mongo
-        client = MongoClient(get_from_env("MONGODB_URL", "MONGODB_URL"))
-        db = client["agents_fm"]
-        col_aidj = db["ai_dj"]
-        # 遍历新闻数据
-        for news_item in news_list[feed_skip:]:
-            # 音乐信息
-            if feed_idx%3 == 0:
-                track = tracks[track_idx]
-                # 如果超出播放列表，则重置 0
-                if track_idx == len(tracks)-1:
-                    track_idx = 0
-                else:
-                    track_idx += 1
-            else:
-                # 转场旋律
-                track = {
-                    "title": "Stay tuned",
-                    "artist": "We'll be right back",
-                    "album": "Coming up next",
-                    "cover": "cover/e13f1bf3-7c50-4515-ba6e-183de1ff5836.jpeg",
-                    "file": "melody/transition.wav"
-                }
-            # 新闻标题和内容
-            title = news_item.metadata['title']
-            link = news_item.metadata['link']
-            content = news_item.page_content
-            # Agent：writer
-            writer = agents.scripts_content_writer()
-            # 任务：撰写脚本
-            draft_scripts = tasks.draft_news_scripts(
-                writer, title, link, content)
-            # Define crew
-            crew = Crew(
-                agents=[writer],
-                tasks=[draft_scripts],
-                verbose=True,
-                process=Process.sequential
-            )
-            result = crew.kickoff()
-            # try:
-            #     out = json.loads(result)
-            # except TypeError:
-            #     print('JSON 解析错误: {}'.format(result))
-            #     break
-                
-            # 保存的数据
-            msg = {
-                "title": title,
-                "script": result,
-                "role": aidj,
-                "track": track,
-                "date": datetime.datetime.now(),
-                "status": 0
+    # mongo
+    client = MongoClient(get_from_env("MONGODB_URL", "MONGODB_URL"))
+    db = client["agents_fm"]
+    col_aidj = db["ai_dj"]
+    col_playlist = db["playlist"]
+    # 获取播放列表
+    track_idx: int = 0
+    tracks = []
+    for track in col_playlist.find().limit(feed_limit):
+        tracks.append(track)
+
+    # mq
+    mq_host = get_from_env("MQ_HOST", "MQ_HOST")
+    
+    # 读取新闻 zh en
+    read_idx:int = 0
+    loader = RSSFeedLoader(
+        urls=urls[feed_url_idx-1:feed_url_idx], nlp=False, language=feed_lang)
+    news_list = loader.load()
+    # agent
+    agents = FMAgents()
+    tasks = FMTasks()
+    
+    # 遍历新闻数据
+    for news_item in news_list[feed_skip:]:
+        
+        # 新闻标题和内容
+        title = news_item.metadata['title']
+        link = news_item.metadata['link']
+        content = news_item.page_content
+        # Agent：writer
+        writer = agents.scripts_content_writer()
+        # 任务：撰写脚本
+        draft_scripts = tasks.draft_news_scripts(
+            writer, title, link, content)
+        # Define crew
+        crew = Crew(
+            agents=[writer],
+            tasks=[draft_scripts],
+            verbose=True,
+            process=Process.sequential
+        )
+        result = crew.kickoff()
+        # try:
+        #     out = json.loads(result)
+        # except TypeError:
+        #     print('JSON 解析错误: {}'.format(result))
+        #     break
+
+        # 音乐信息
+        if len(result) > 300:
+            track = tracks[track_idx]
+            # 如果超出播放列表，则重置 0
+            track_idx += 1
+            # 从播放列表中删除
+            col_playlist.delete_one({"_id":track["_id"]})
+        else:
+            # 转场旋律
+            track = {
+                "title": "Stay tuned",
+                "artist": "We'll be right back",
+                "album": "Coming up next",
+                "cover": "cover/e13f1bf3-7c50-4515-ba6e-183de1ff5836.jpeg",
+                "file": "melody/transition.wav"
             }
-            # resfile = open(
-            #     "./human/{0}_{1}.json".format(aidj, crew.id.hex),
-            #     "w", encoding="utf-8")
-            # resfile.write(json.dumps(msg))
-            # resfile.close()
-            # 保存到 MongoDB
-            script_id = col_aidj.insert_one(msg).inserted_id
-            print("Script ID: {}".format(script_id))
             
-            # 计数器
-            feed_idx += 1
-            if feed_limit < feed_idx:
-                break
-            # Sleep
-            time.sleep(6)
-        # close
-        client.close()
+        # 保存的数据
+        msg = {
+            "title": title,
+            "script": result,
+            "role": aidj,
+            "track": track,
+            "date": datetime.datetime.now(),
+            "status": 0
+        }
+        # resfile = open(
+        #     "./human/{0}_{1}.json".format(aidj, crew.id.hex),
+        #     "w", encoding="utf-8")
+        # resfile.write(json.dumps(msg))
+        # resfile.close()
+        # 保存到 MongoDB
+        script_id = col_aidj.insert_one(msg).inserted_id
+        print("Script ID: {}".format(script_id))
+        
+        # 计数器
+        feed_idx += 1
+        if feed_limit-1 < feed_idx:
+            break
+        # Sleep
+        time.sleep(6)
+    # close
+    client.close()

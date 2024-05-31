@@ -155,13 +155,14 @@ class FMTasks:
                 - Notice ...
                 - Note ...
                 - etc.
-                2. The final copy content, which must be in plain text format, 
+                2. The Final Answer must be in **plain Chinese text** format,
                 should not contain characters from other formats, such as Markdown.
+                3. Please confirm that the Final Answer is in **Simplified Chinese**.
 
                 {self.__tip_section()}
                 """
             ),
-            expected_output="A coherent and amazing plain Chinese text, up to 3000 words",
+            expected_output="A coherent and amazing plain Chinese text, up to 2000 words",
             agent=agent
         )
 

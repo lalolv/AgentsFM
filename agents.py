@@ -32,6 +32,7 @@ class FMAgents:
         #     model="gemini-1.5-flash", google_api_key=os.getenv('GEMINI_KEY'))
         # self.Ollama = Ollama(model="llama3:instruct")
         self.Qwen = Ollama(model="qwen:14b-chat-v1.5")
+        # self.Phi3 = Ollama(model="phi3:medium-128k")
         # self.Yi = Ollama(model="yi:9b-v1.5")
         # GROP, 30 RPM; 14,400 RPD; 
         # mixtral-8x7b-32768 5,000 TPM
@@ -87,8 +88,8 @@ class FMAgents:
             allow_delegation=False,
             verbose=True,
             llm=self.Qwen,
-            max_iter=15,
-            max_rpm=30,
+            max_iter=10,
+            max_rpm=25,
             memory=False
         )
     
