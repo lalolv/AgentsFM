@@ -109,7 +109,13 @@ if __name__ == "__main__":
             "title": title,
             "script": result,
             "role": aidj,
-            "track": track,
+            "track": {
+                "title": track["title"],
+                "artist": track["artist"],
+                "album": track["album"],
+                "cover": track["cover"],
+                "file": track["file"]
+            },
             "date": datetime.datetime.now(),
             "status": 0
         }
