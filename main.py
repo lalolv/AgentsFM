@@ -1,11 +1,10 @@
 from dotenv import load_dotenv
-import os
 import json
 import time, datetime
-import random
 from langchain_community.document_loaders import RSSFeedLoader
 from agents import FMAgents
 from tasks import FMTasks
+from utils.console import print_ok, print_header
 from crewai import Crew, Process
 from pymongo import MongoClient
 from langchain_core.utils import get_from_env
@@ -19,7 +18,7 @@ load_dotenv()
 
 # This is the main function that you will use to run your custom crew.
 if __name__ == "__main__":
-    print("## Welcome to AI Agents FM")
+    print_header("## Welcome to AI Agents FM")
     print("-------------------------------")
 
     aidj = input("AI DJ [nancy ting xiao tong bai qiang john]: ")
@@ -81,12 +80,6 @@ if __name__ == "__main__":
             process=Process.sequential
         )
         result = crew.kickoff()
-        # try:
-        #     out = json.loads(result)
-        # except TypeError:
-        #     print('JSON 解析错误: {}'.format(result))
-        #     break
-
         # 音乐信息
         if len(result) > 300:
             track = tracks[track_idx]
@@ -119,14 +112,9 @@ if __name__ == "__main__":
             "date": datetime.datetime.now(),
             "status": 0
         }
-        # resfile = open(
-        #     "./human/{0}_{1}.json".format(aidj, crew.id.hex),
-        #     "w", encoding="utf-8")
-        # resfile.write(json.dumps(msg))
-        # resfile.close()
         # 保存到 MongoDB
         script_id = col_aidj.insert_one(msg).inserted_id
-        print("Script ID: {}".format(script_id))
+        print_ok("Script ID: {}".format(script_id))
         
         # 计数器
         feed_idx += 1
@@ -136,3 +124,4 @@ if __name__ == "__main__":
         time.sleep(6)
     # close
     client.close()
+    print_ok("Completed: {0}, {1}".format(aidj, feed_tag))
