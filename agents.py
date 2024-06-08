@@ -84,7 +84,7 @@ class FMAgents:
                 Turn bland words into compelling stories.
             """),
             goal=dedent(f"""Write a summary paragraph in Chinese"""),
-            tools=[wikipedia_tool, tavily_search_tool],
+            tools=[tavily_search_tool, wikipedia_tool],
             allow_delegation=False,
             verbose=True,
             llm=self.Qwen,

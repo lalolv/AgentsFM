@@ -21,7 +21,7 @@ if __name__ == "__main__":
     print_header("## Welcome to AI Agents FM")
     print("-------------------------------")
 
-    aidj = input("AI DJ [nancy ting xiao tong bai qiang john]: ")
+    aidj = input("AI DJ [nancy ting xiao tong bai qiang]: ")
     feed_tag = input("Feed Tag [zh en]: ")
     feed_skip = int(input("Feed Skip: "))
     feed_limit = int(input("Feed Limit: "))
