@@ -11,6 +11,7 @@ from langchain_community.tools.bing_search import BingSearchRun
 from langchain_community.tools import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
 from dotenv import load_dotenv
+from langchain.utils import get_from_env
 
 
 load_dotenv()
@@ -28,10 +29,10 @@ class FMAgents:
     def __init__(self):
         # self.OpenAIGPT4 = ChatOpenAI(model_name="gpt-4", temperature=0.7)
         # self.AzureOpenAI = AzureChatOpenAI()
-        # self.Gemini = GoogleGenerativeAI(
-        #     model="gemini-1.5-flash", google_api_key=os.getenv('GEMINI_KEY'))
+        self.Gemini = GoogleGenerativeAI(
+            model="gemini-1.5-flash", google_api_key=get_from_env('GEMINI_KEY', 'GEMINI_KEY'))
         # self.Ollama = Ollama(model="llama3:instruct")
-        self.Qwen = Ollama(model="qwen:14b-chat-v1.5")
+        self.Qwen = Ollama(model="qwen2")
         # self.Phi3 = Ollama(model="phi3:medium-128k")
         # self.Yi = Ollama(model="yi:9b-v1.5")
         # GROP, 30 RPM; 14,400 RPD; 
@@ -88,8 +89,8 @@ class FMAgents:
             allow_delegation=False,
             verbose=True,
             llm=self.Qwen,
-            max_iter=10,
-            max_rpm=25,
+            max_iter=6,
+            max_rpm=10,
             memory=False
         )
     

@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from langchain_core.utils import get_from_env
 from dotenv import load_dotenv
 from utils.console import print_ok, print_header
+from tqdm import tqdm
 import time
 import json
 import pika
@@ -25,7 +26,7 @@ channel = connection.channel()
 channel.queue_declare(queue=push_topic, durable=True)
 
 filter = {}
-for item in col_recently.find(filter).limit(repeat_limit):
+for item in tqdm(col_recently.find(filter).limit(repeat_limit),  desc="Processing"):
     push_msg = json.dumps({
         "title": item["title"],
         "subtitle": item["subtitle"],
@@ -39,6 +40,6 @@ for item in col_recently.find(filter).limit(repeat_limit):
     # remove data
     col_recently.delete_one({"_id": item["_id"]})
     # sleep
-    time.sleep(2)
+    time.sleep(1)
 
 connection.close()

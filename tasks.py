@@ -159,6 +159,8 @@ class FMTasks:
                 should not contain characters from other formats, such as Markdown.
                 3. Please confirm that the Final Answer is in **Simplified Chinese**.
 
+                ----
+                
                 {self.__tip_section()}
                 """
             ),
